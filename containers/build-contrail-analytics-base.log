@@ -1,0 +1,9 @@
+Sending build context to Docker daemon  3.072kB
+Step 1/3 : FROM 10.87.64.33:5043/contrail-base:4.1.0.0-4
+ ---> a3ed9868e314
+Step 2/3 : RUN yum install -y contrail-openstack-analytics &&     yum clean all -y &&     rm -rf /var/cache/yum
+ ---> Running in e8dc58eb205c
+Loaded plugins: fastestmirror, ovl, priorities
+[91mftp://ftp.ussg.iu.edu/linux/centos/7.4.1708/extras/x86_64/repodata/repomd.xml: [Errno 12] Timeout on ftp://ftp.ussg.iu.edu/linux/centos/7.4.1708/extras/x86_64/repodata/repomd.xml: (28, 'Connection timed out after 30001 milliseconds')
+[0m[91mTrying other mirror.
+[0m

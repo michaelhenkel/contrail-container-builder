@@ -1,0 +1,7 @@
+FROM 10.87.64.33:5043/contrail-controller-database-base:4.1.0.0-4
+
+RUN yum install -y redis
+
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["redis-server","/etc/redis.conf"]

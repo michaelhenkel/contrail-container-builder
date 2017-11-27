@@ -1,0 +1,33 @@
+version: '2'
+services:
+  network:
+    image: docker.io/kubernetes/pause
+    network_mode: "host"
+    volumes:
+      - /etc/hosts:/etc/hosts
+  job:
+    image: 10.87.64.33:5043/contrail-controller-webui-job:4.0.0.0-20
+    env_file: ../../common.env
+    environment:
+    - cnfg_server_ip='10.87.64.31'
+    - analytics_server_ip='10.87.64.31'
+    - dns_server_ip='10.87.64.31'
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    #restart: on-failure
+  web:
+    image: 10.87.64.33:5043/contrail-controller-webui-web:4.0.0.0-20
+    env_file: ../../common.env
+    environment:
+    - cnfg_server_ip='10.87.64.31'
+    - analytics_server_ip='10.87.64.31'
+    - dns_server_ip='10.87.64.31'
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    ##restart: on-failure

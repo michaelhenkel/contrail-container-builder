@@ -1,7 +1,18 @@
 #!/bin/bash
 containers_dir="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
-source "$containers_dir/../parse-env.sh"
+version=$CONTRAIL_VERSION
+os_version=$OPENSTACK_VERSION
+registry=$CONTRAIL_REGISTRY
+repository=$CONTRAIL_REPOSITORY
+
+env_dir="${BASH_SOURCE%/*}"
+source build.env
+
+version=${version:-${CONTRAIL_VERSION:-'4.0.2.0-35'}}
+os_version=${os_version:-${OPENSTACK_VERSION:-'newton'}}
+registry=${registry:-${CONTRAIL_REGISTRY:-'auto'}}
+repository=${repository:-${CONTRAIL_REPOSITORY:-'auto'}}
 
 path=$1
 opts=$2

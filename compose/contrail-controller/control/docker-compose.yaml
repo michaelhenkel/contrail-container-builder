@@ -1,0 +1,41 @@
+version: '2.1'
+services:
+  network:
+    image: docker.io/kubernetes/pause
+    network_mode: "host"
+    volumes:
+      - /etc/hosts:/etc/hosts
+  control:
+    image: 10.87.64.33:5043/contrail-controller-control-control:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    #restart: on-failure
+  dns:
+    image: 10.87.64.33:5043/contrail-controller-control-dns:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    privileged: true
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+      - /etc/contrail/dns
+    depends_on:
+      - network
+    ##restart: on-failure
+  named:
+    image: 10.87.64.33:5043/contrail-controller-control-named:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    privileged: true
+    pid: "service:dns"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    volumes_from:
+      - dns
+    depends_on:
+      - network
+      - dns
+   ##restart: on-failure

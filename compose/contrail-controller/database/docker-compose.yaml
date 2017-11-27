@@ -1,0 +1,45 @@
+version: '2'
+services:
+  network:
+    image: docker.io/kubernetes/pause
+    network_mode: "host"
+    volumes:
+      - /etc/hosts:/etc/hosts
+  cassandra:
+    image: 10.87.64.33:5043/contrail-controller-database:4.0.0.0-20
+    env_file: ../../common.env
+    environment:
+     - CASSANDRA_START_RPC=true
+     - CASSANDRA_CLUSTER_NAME=contrail_database
+    volumes:
+     - /var/lib/cassandra/data
+    network_mode: "service:network"
+    depends_on:
+      - network
+    restart: on-failure
+  zookeeper:
+    image: 10.87.64.33:5043/contrail-controller-zookeeper:4.0.0.0-20
+    env_file: ../../common.env
+    volumes:
+     - /data
+    network_mode: "service:network"
+    depends_on:
+      - network
+    restart: on-failure
+  rabbitmq:
+    image: 10.87.64.33:5043/contrail-controller-rabbitmq:4.0.0.0-20
+    env_file: ../../common.env
+    environment:
+     - RABBITMQ_ERLANG_COOKIE=abcdefg
+    network_mode: "service:network"
+    depends_on:
+      - network
+    restart: on-failure
+  redis:
+    image: 10.87.64.33:5043/contrail-controller-redis:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    network_mode: "host"
+    depends_on:
+      - network
+    restart: on-failure

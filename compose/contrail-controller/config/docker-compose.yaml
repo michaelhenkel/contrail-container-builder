@@ -1,0 +1,52 @@
+version: '2'
+services:
+  network:
+    image: docker.io/kubernetes/pause
+    network_mode: "host"
+    volumes:
+      - /etc/hosts:/etc/hosts
+  nodemgr:
+    image: 10.87.64.33:5043/contrail-controller-config-nodemgr:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    #restart: on-failure
+  api:
+    image: 10.87.64.33:5043/contrail-controller-config-api:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    ##restart: on-failure
+  svcmonitor:
+    image: 10.87.64.33:5043/contrail-controller-config-svcmonitor:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    #restart: on-failure
+  schema:
+    image: 10.87.64.33:5043/contrail-controller-config-schema:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    #restart: on-failure
+  devicemgr:
+    image: 10.87.64.33:5043/contrail-controller-config-devicemgr:4.0.0.0-20
+    env_file: ../../common.env
+    network_mode: "service:network"
+    volumes:
+      - /var/log/docker/contrail:/var/log/contrail
+    depends_on:
+      - network
+    #restart: on-failure

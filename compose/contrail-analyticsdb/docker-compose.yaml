@@ -1,0 +1,36 @@
+version: '2'
+services:
+  network:
+    image: docker.io/kubernetes/pause
+    network_mode: "host"
+    volumes:
+      - /etc/hosts:/etc/hosts
+#  cassandra:
+#    image: 10.87.64.33:5043/contrail-analyticsdb-database:4.0.0.0-20
+#    env_file: ../common.env
+#    environment:
+#     - CASSANDRA_START_RPC=true
+#     - CASSANDRA_CLUSTER_NAME=contrail_analytics_db
+#     - CASSANDRA_JMX_PORT=7200
+#     - CASSANDRA_RPC_PORT=9161
+#     - CASSANDRA_NATIVE_TRANSPORT_PORT=9043
+#     - CASSANDRA_STORAGE_PORT=7010
+#     - CASSANDRA_SSL_STORAGE_PORT=7011
+#    volumes:
+#     - /var/lib/cassandra/data
+#    network_mode: "service:network"
+#    depends_on:
+#      - network
+#    restart: on-failure
+  kafka:
+    image: 10.87.64.33:5043/contrail-analyticsdb-kafka:4.0.0.0-20
+    env_file: ../common.env
+    network_mode: "service:network"
+    depends_on:
+      - network
+  redis-query:
+    image: 10.87.64.33:5043/contrail-analyticsdb-redis-query:4.0.0.0-20
+    env_file: ../common.env
+    network_mode: "service:network"
+    depends_on:
+      - network
