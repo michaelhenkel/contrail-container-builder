@@ -17,6 +17,22 @@ zookeeper=$ZOOKEEPER_SERVERS
 api_server_list=$CONFIG_SERVERS
 api_server_use_ssl=${CONFIG_API_USE_SSL:-False}
 
+[CONFIGDB]
+# AMQP related configs
+rabbitmq_server_list=$RABBITMQ_SERVERS
+rabbitmq_vhost=$RABBITMQ_VHOST
+rabbitmq_user=$RABBITMQ_USER
+rabbitmq_password=$RABBITMQ_PASSWORD
+rabbitmq_use_ssl=$RABBITMQ_USE_SSL
+# rabbitmq_ssl_version=
+# rabbitmq_ssl_keyfile=
+# rabbitmq_ssl_certfile=
+# rabbitmq_ssl_ca_certs=
+#
+config_db_server_list=$CONFIGDB_CQL_SERVERS
+# config_db_username=
+# config_db_password=
+
 $sandesh_client_config
 EOM
 
