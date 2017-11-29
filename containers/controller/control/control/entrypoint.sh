@@ -34,7 +34,7 @@ xmpp_auth_enable=${XMPP_AUTH_ENABLE:-False}
 
 [CONFIGDB]
 # AMQP related configs
-rabbitmq_server_list=$RABBITMQ_SERVERS
+rabbitmq_server_list=$RABBITMQ_SERVERS_BLANK
 rabbitmq_vhost=$RABBITMQ_VHOST
 rabbitmq_user=$RABBITMQ_USER
 rabbitmq_password=$RABBITMQ_PASSWORD
