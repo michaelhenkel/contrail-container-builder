@@ -107,7 +107,9 @@ function insert_vrouter() {
 kver=`uname -r | awk -F"-" '{print $1}'`
 modfile=`ls -1rt /opt/contrail/vrouter-kernel-modules/$kver-*/vrouter.ko | tail -1`
 echo "Modprobing vrouter "$modfile
-insmod $modfile
+if ! lsmod | grep -q vrouter; then
+  insmod $modfile
+fi
 if ! lsmod | grep -q vrouter ; then
   echo "Failed to insert vrouter kernel module"
   exit 1

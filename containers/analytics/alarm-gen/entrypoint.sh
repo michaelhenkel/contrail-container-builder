@@ -13,18 +13,21 @@ log_level=${ALARMGEN_LOG_LEVEL:-$LOG_LEVEL}
 log_local=${ALARMGEN_LOG_LOCAL:-$LOG_LOCAL}
 collectors=$COLLECTOR_SERVERS
 kafka_broker_list=$KAFKA_SERVERS
-zk_list=${ZOOKEEPER_SERVERS:-`get_server_list ZOOKEEPER ":$ZOOKEEPER_PORT "`}
+zk_list=${ALARM_GEN_zk_list:-`get_server_list ZOOKEEPER ":$ZOOKEEPER_PORT "`}
+
+[API_SERVER]
+# List of api-servers in ip:port format separated by space
+api_server_list=$CONFIG_SERVERS
+api_server_use_ssl=${CONFIG_API_USE_SSL:-False}
+
+[CONFIGDB]
 rabbitmq_server_list=$RABBITMQ_NODES
 rabbitmq_port=$RABBITMQ_PORT
 rabbitmq_vhost=$RABBITMQ_VHOST
 rabbitmq_user=$RABBITMQ_USER
 rabbitmq_password=$RABBITMQ_PASSWORD
 rabbitmq_use_ssl=$RABBITMQ_USE_SSL
-
-[API_SERVER]
-# List of api-servers in ip:port format separated by space
-api_server_list=$CONFIG_SERVERS
-api_server_use_ssl=${CONFIG_API_USE_SSL:-False}
+config_db_server_list = $CONFIGDB_SERVERS
 
 [REDIS]
 #redis_server_port=${ALARM_GEN_redis_server_port:-6379}
