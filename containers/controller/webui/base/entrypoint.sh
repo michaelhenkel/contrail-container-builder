@@ -8,6 +8,10 @@ function get_server_json_list(){
   echo "['"$srv_list"']"
 }
 
+if [[ ${CLOUD_ORCHESTRATOR} != "openstack" ]]; then
+  CLOUD_ORCHESTRATOR=none
+fi
+
 cat > /etc/contrail/config.global.js << EOM
 /*
  * Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.

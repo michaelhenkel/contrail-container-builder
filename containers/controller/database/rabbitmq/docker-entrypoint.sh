@@ -4,6 +4,30 @@
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
 # (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
 #  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+echo $RABBITMQ_ERLANG_COOKIE > /var/lib/rabbitmq/.erlang.cookie
+chmod 600 /var/lib/rabbitmq/.erlang.cookie
+local_ips=$(cat "/proc/net/fib_trie" | awk '/32 host/ { print f } {f=$2}')
+CONTROLLER_NODES=${CONTROLLER_NODES:-`hostname`}
+RABBITMQ_NODES=${RABBITMQ_NODES:-${CONTROLLER_NODES}}
+IFS=',' read -ra server_list <<< "${RABBITMQ_NODES}"
+rabbit_node_list=''
+for server in ${server_list[@]}; do
+  host -4 $server
+  if [ $? -eq 0 ]; then
+    server_hostname=`host -4 $server |cut -d" " -f5 |awk -F"." '{print $1}'`
+    server_hostname=${server_hostname::-1}
+  else
+    server_hostname=`getent hosts $server |awk '{print $2}'| awk -F"." '{print $1}'`
+  fi
+  rabbit_node_list+="'rabbit@${server_hostname}',"
+  if [[ "$local_ips" =~ "$server" ]] ; then
+    my_ip=$srv
+    my_hostname=$server_hostname
+    echo $my_hostname
+  fi
+done
+rabbit_node_list=${rabbit_node_list::-1}
+export RABBITMQ_NODENAME=rabbit@${my_hostname}
 file_env() {
 	local var="$1"
 	local fileVar="${var}_FILE"
@@ -253,6 +277,11 @@ if [ "$shouldWriteConfig" ]; then
 	rabbitConfig=(
 		"{ loopback_users, $(rabbit_array) }"
 	)
+        if [ `echo ${#server_list[@]}` -gt 1 ]; then
+        rabbitConfig+=(
+                "{ cluster_nodes, {[$rabbit_node_list], disc }}"
+        )
+        fi
 
 	# determine whether to set "vm_memory_high_watermark" (based on cgroups)
 	memTotalKb=
@@ -402,34 +431,6 @@ if [ "$haveSslConfig" ] && [ -f "$combinedSsl" ]; then
 	sslErlArgs="-pa $ERL_SSL_PATH -proto_dist inet_tls -ssl_dist_opt server_certfile $combinedSsl -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true"
 	export RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS:-} $sslErlArgs"
 	export RABBITMQ_CTL_ERL_ARGS="${RABBITMQ_CTL_ERL_ARGS:-} $sslErlArgs"
-fi
-function get_listen_ip(){
-  default_interface=`ip route show |grep "default via" |awk '{print $5}'`
-  default_ip_address=`ip address show dev $default_interface |\
-                    head -3 |tail -1 |tr "/" " " |awk '{print $2}'`
-  echo ${default_ip_address}
-}
-CONTROLLER_NODES=${CONTROLLER_NODES:-`hostname`}
-RABBITMQ_NODES=${RABBITMQ_NODES:-${CONTROLLER_NODES}}
-IFS=',' read -ra server_list <<< "${RABBITMQ_NODES}"
-master_server_ip=${server_list[0]}
-host -4 $master_server_ip
-if [ $? -eq 0 ]; then
-  master_server_hostname=`host -4 $master_server_ip |cut -d" " -f5`
-  master_server_hostname=${master_server_hostname::-1}
-else
-  master_server_hostname=`getent hosts $master_server_ip |awk '{print $2}'`
-fi
-if [ $master_server_ip != `get_listen_ip` ]; then
-  /usr/lib/rabbitmq/bin/rabbitmq-server -detached
-  /usr/lib/rabbitmq/bin/rabbitmqctl stop_app
-  /usr/lib/rabbitmq/bin/rabbitmqctl join_cluster rabbit@$master_server_hostname
-  while [ $? -ne 0 ]; do
-    sleep 3
-    /usr/lib/rabbitmq/bin/rabbitmqctl join_cluster rabbit@$master_server_hostname
-  done
-  /usr/lib/rabbitmq/bin/rabbitmqctl start_app
-  /usr/lib/rabbitmq/bin/rabbitmqctl shutdown
 fi
 
 exec "$@"

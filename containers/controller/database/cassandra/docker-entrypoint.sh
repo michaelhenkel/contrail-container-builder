@@ -20,7 +20,8 @@ fi
 if [ -n "${CASSANDRA_NAME:+1}" ]; then
 	: ${CASSANDRA_SEEDS:="cassandra"}
 fi
-: ${CASSANDRA_SEEDS:="$CASSANDRA_BROADCAST_ADDRESS"}
+IFS=',' read -ra server_list <<< "${CONTROLLER_NODES}"
+: ${CASSANDRA_SEEDS:="${server_list[0]}"}
 
 sed -ri 's/(- seeds:).*/\1 "'"$CASSANDRA_SEEDS"'"/' "$CASSANDRA_CONFIG/cassandra.yaml"
 
